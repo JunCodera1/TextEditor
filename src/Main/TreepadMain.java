@@ -8,7 +8,7 @@ public class TreepadMain {
     public static void main(String[] args) {
         TreepadView view = new TreepadView();
         TreepadModel model = new TreepadModel();
-        TreepadController controller = new TreepadController(view);
+        TreepadController controller = new TreepadController(view, model);
 
         controller.setModel(model);
         view.setVisible(true);
