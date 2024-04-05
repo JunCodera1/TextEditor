@@ -53,14 +53,13 @@ public class TreepadView extends JFrame {
         menu.add(exit);
         menuBar.add(menu);
 
-        // Add menu bar to the frame
         this.setJMenuBar(menuBar);
 
-        // Add components to the frame
+        
         this.add(scrollText, BorderLayout.CENTER);
         this.add(scrollTree, BorderLayout.WEST);
+        
 
-        // Create controller and attach action listeners
         TreepadModel model = new TreepadModel();
         controller = new TreepadController(this, model);
         open.addActionListener(controller);

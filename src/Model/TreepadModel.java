@@ -1,6 +1,7 @@
 package Model;
 
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -13,16 +14,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 public class TreepadModel {
-    private Map<String, DefaultMutableTreeNode> openedFolders; 
+    private Map<String, DefaultMutableTreeNode> openedFolders;
 
     public TreepadModel() {
         openedFolders = new HashMap<>();
@@ -39,7 +40,6 @@ public class TreepadModel {
             }
         }
 
-        // Add mouse listener to the tree
         tree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -49,11 +49,9 @@ public class TreepadModel {
             }
         });
     }
+
     public void save(JTextArea textArea) {
         JFileChooser fileChooser = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Files", "txt");
-        fileChooser.setFileFilter(filter);
-
         int returnValue = fileChooser.showSaveDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
@@ -78,49 +76,40 @@ public class TreepadModel {
             treeModel.setRoot(root);
             expandNode(root, tree);
         }
-
-        ((DefaultTreeModel) tree.getModel()).reload();
     }
 
     public void handleTreeMouseClick(MouseEvent e, JTextArea textArea, JTree tree) {
         int selRow = tree.getRowForLocation(e.getX(), e.getY());
         TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-        if (selRow != -1) {
+        if (selPath != null) {
             DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) selPath.getLastPathComponent();
-            if (selectedNode.isLeaf()) { 
-                File selectedFile = new File(selectedNode.toString());
-                if (selectedFile.isFile()) { 
-                    System.out.println("Opening file: " + selectedFile.getAbsolutePath()); // Ghi log
+            if (selectedNode != null && selectedNode.isLeaf()) {
+                Object userObject = selectedNode.getUserObject();
+                if (userObject instanceof File) {
+                    File selectedFile = (File) userObject;
                     openSelectedFile(selectedFile, textArea);
                 }
             }
         }
     }
 
-
-
     private void openSelectedFile(File file, JTextArea textArea) {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            StringBuilder idea = new StringBuilder();
             String line;
+			textArea.setText("");
             while ((line = reader.readLine()) != null) {
-                idea.append(line).append("\n");
+                textArea.append(line + "\n");
             }
-            textArea.append(idea.toString()); // Sử dụng append để thêm nội dung mới vào JTextArea
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
-
-   
-
     public void fillTree(File directory, DefaultMutableTreeNode parent) {
         File[] files = directory.listFiles();
         if (files != null) {
             for (File file : files) {
-                DefaultMutableTreeNode node = new DefaultMutableTreeNode(file.getName());
+                DefaultMutableTreeNode node = new DefaultMutableTreeNode(file);
                 parent.add(node);
                 if (file.isDirectory()) {
                     fillTree(file, node);

@@ -10,7 +10,6 @@ public class TreepadMain {
         TreepadModel model = new TreepadModel();
         TreepadController controller = new TreepadController(view, model);
 
-        controller.setModel(model);
         view.setVisible(true);
     }
 }

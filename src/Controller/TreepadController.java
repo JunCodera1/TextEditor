@@ -3,6 +3,9 @@ package Controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import Model.TreepadModel;
@@ -18,22 +21,21 @@ public class TreepadController implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+        Map<String, Runnable> actions = new HashMap<>();
+        // Open
+        actions.put("Open", () -> model.open(view.getTextArea(), view, view.getTree()));
+        
+        //Exit
+        actions.put("Exit", () -> System.exit(0));
+        
+        //Save
+        actions.put("Save", () -> model.save(view.getTextArea()));
+
         String command = e.getActionCommand();
-        switch (command) {
-            case "Open":
-                model.open(view.getTextArea(), view, view.getTree());
-                break;
-            case "Exit":
-                System.exit(0);
-                break;
-            case "Save":
-                model.save(view.getTextArea());
-                break;
+        Runnable action = actions.get(command);
+        if (action != null) {
+            action.run();
         }
     }
 
-	public void setModel(TreepadModel model2) {
-		// TODO Auto-generated method stub
-		
-	}
 }
